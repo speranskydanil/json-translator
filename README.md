@@ -118,6 +118,92 @@ The output will be:
     :docs=>[{:title=>"I am the God", :text=>"<b>yep</b>"}]}]}
 ```
 
+### Shortcuts
+
+Methods `iterate`, `scope`, `namespace` have one symbol shorcuts:
+
+```ruby
+hash = JT.t(json) {
+  total
+
+  iterate(:users, :results) {
+    status
+
+    s(:personalInformation) { age; city }
+    n(:account_info) { money; account_name 'accountName' }
+    i(:docs, :documents) { title; text 'htmlContent' }
+  }
+}
+```
+
+### Syntax with '.' symbol
+
+Scopes and namespaces support syntax with '.' symbol to avoid block nesting.
+For json:
+
+```ruby
+json = <<-json
+{
+   "user":{
+      "name":"Speransky Danil",
+      "age":23,
+      "city":"Novosibirsk",
+      "account":{
+         "money":500.0,
+         "cart":{
+            "total":2,
+            "items":[
+               {
+                  "productId":143,
+                  "count":1
+               },
+               {
+                  "productId":245,
+                  "count":2
+               }
+            ]
+         }
+      }
+   }
+}
+json
+```
+
+Instead of
+
+```ruby
+hash = JT.t(json) {
+  s(:user) {
+    name
+    s(:account) {
+      s(:cart) {
+        items_count 'total'
+      }
+    }
+  }
+}
+
+pp hash #=> {:name=>"Speransky Danil", :items_count=>2}
+```
+
+You write
+
+```ruby
+hash = JT.t(json) {
+  s(:user) {
+    name
+    s('account.cart') { items_count 'total' }
+  }
+}
+
+pp hash #=> {:name=>"Speransky Danil", :items_count=>2}
+```
+
+### Notices
+
+* `JT.t` accepts json string or hash or array
+* Itaratings, scopes and namespaces could be nested in any order and arbitrary number of times
+
 **Author (Speransky Danil):**
 [Personal Page](http://dsperansky.info) |
 [LinkedIn](http://ru.linkedin.com/in/speranskydanil/en) |
