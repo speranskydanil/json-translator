@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>JSON Translator by speranskydanil</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">JSON Translator</h1>
+      <h2 class="project-tagline">A library to transform json from one scheme to another.</h2>
+      <a href="https://github.com/speranskydanil/json-translator" class="btn">View on GitHub</a>
+      <a href="https://github.com/speranskydanil/json-translator/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/speranskydanil/json-translator/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="json-translator" class="anchor" href="#json-translator" aria-hidden="true"><span class="octicon octicon-link"></span></a>Json Translator</h1>
+
+<p>A library to transform json from one scheme to another.</p>
+
+<h2>
+<a id="installing" class="anchor" href="#installing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installing</h2>
+
+<pre><code>gem install json-translator
+
+require 'json-translator'
+</code></pre>
+
+<h3>
+<a id="quick-example" class="anchor" href="#quick-example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quick example</h3>
+
+<p>Suppose we use API which responses with next simple json:</p>
+
+<pre><code>json = &lt;&lt;-json
+{
+   "total":2,
+   "page":1,
+   "perPage":5,
+   "requestLimit":7,
+   "results":[
+      {
+         "id":21,
+         "status":"active",
+         "accountName":"daz143",
+         "money":500.0,
+         "personalInformation":{
+            "age":23,
+            "city":"Novosibirsk",
+            "firstName":"Danil",
+            "lastName":"Speranskiy"
+         },
+         "documents":[
+            {
+               "title":"Note #1",
+               "htmlContent":"\u003cp\u003eok\u003c/p\u003e"
+            },
+            {
+               "title":"Note #2",
+               "htmlContent":"\u003ch3\u003eHi there!\u003c/h3\u003e"
+            }
+         ]
+      },
+      {
+         "id":22,
+         "status":"deleted",
+         "accountName":"damaty",
+         "money":63.24,
+         "personalInformation":{
+            "age":24,
+            "city":"Berdsk",
+            "firstName":"Dmitry",
+            "lastName":"Kirichenko"
+         },
+         "documents":[
+            {
+               "title":"I am the good",
+               "htmlContent":"\u003cb\u003eyep\u003c/b\u003e"
+            }
+         ]
+      }
+   ]
+}
+json
+</code></pre>
+
+<p>Now we want to change the json scheme.</p>
+
+<div class="highlight highlight-ruby"><pre>hash <span class="pl-k">=</span> <span class="pl-c1">JT</span>.t(json) <span class="pl-k">do</span>
+  <span class="pl-c"># save as it is</span>
+  total
+
+  <span class="pl-c"># rename 'results' to :users</span>
+  <span class="pl-c"># map each user with code below</span>
+  iterate <span class="pl-c1">:users</span>, <span class="pl-c1">:results</span> <span class="pl-k">do</span>
+    status
+
+    <span class="pl-c"># scopes allow you to fetch data from nested objects</span>
+    scope <span class="pl-c1">:personalInformation</span> <span class="pl-k">do</span>
+      age
+      city
+    <span class="pl-k">end</span>
+
+    <span class="pl-c"># namespaces allow you to provide nesting in resulting hash</span>
+    namespace <span class="pl-c1">:account_info</span> <span class="pl-k">do</span>
+      money
+      <span class="pl-c"># rename 'accountName' to :account_name</span>
+      account_name <span class="pl-s"><span class="pl-pds">'</span>accountName<span class="pl-pds">'</span></span>
+    <span class="pl-k">end</span>
+
+    iterate <span class="pl-c1">:docs</span>, <span class="pl-c1">:documents</span> <span class="pl-k">do</span>
+      title
+      <span class="pl-c"># rename 'htmlContent' to :text</span>
+      text <span class="pl-s"><span class="pl-pds">'</span>htmlContent<span class="pl-pds">'</span></span>
+    <span class="pl-k">end</span>
+  <span class="pl-k">end</span>
+<span class="pl-k">end</span>
+
+pp hash</pre></div>
+
+<p>The output will be:</p>
+
+<div class="highlight highlight-ruby"><pre>{<span class="pl-c1">:total</span>=&gt;<span class="pl-c1">2</span>,
+ <span class="pl-c1">:users</span>=&gt;
+  [{<span class="pl-c1">:status</span>=&gt;<span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span>,
+    <span class="pl-c1">:age</span>=&gt;<span class="pl-c1">23</span>,
+    <span class="pl-c1">:city</span>=&gt;<span class="pl-s"><span class="pl-pds">"</span>Novosibirsk<span class="pl-pds">"</span></span>,
+    <span class="pl-c1">:account_info</span>=&gt;{<span class="pl-c1">:money</span>=&gt;<span class="pl-c1">500.0</span>, <span class="pl-c1">:account_name</span>=&gt;<span class="pl-s"><span class="pl-pds">"</span>daz143<span class="pl-pds">"</span></span>},
+    <span class="pl-c1">:docs</span>=&gt;
+     [{<span class="pl-c1">:title</span>=&gt;<span class="pl-s"><span class="pl-pds">"</span>Note #1<span class="pl-pds">"</span></span>, <span class="pl-c1">:text</span>=&gt;<span class="pl-s"><span class="pl-pds">"</span>&lt;p&gt;ok&lt;/p&gt;<span class="pl-pds">"</span></span>},
+      {<span class="pl-c1">:title</span>=&gt;<span class="pl-s"><span class="pl-pds">"</span>Note #2<span class="pl-pds">"</span></span>, <span class="pl-c1">:text</span>=&gt;<span class="pl-s"><span class="pl-pds">"</span>&lt;h3&gt;Hi there!&lt;/h3&gt;<span class="pl-pds">"</span></span>}]},
+   {<span class="pl-c1">:status</span>=&gt;<span class="pl-s"><span class="pl-pds">"</span>deleted<span class="pl-pds">"</span></span>,
+    <span class="pl-c1">:age</span>=&gt;<span class="pl-c1">24</span>,
+    <span class="pl-c1">:city</span>=&gt;<span class="pl-s"><span class="pl-pds">"</span>Berdsk<span class="pl-pds">"</span></span>,
+    <span class="pl-c1">:account_info</span>=&gt;{<span class="pl-c1">:money</span>=&gt;<span class="pl-c1">63.24</span>, <span class="pl-c1">:account_name</span>=&gt;<span class="pl-s"><span class="pl-pds">"</span>damaty<span class="pl-pds">"</span></span>},
+    <span class="pl-c1">:docs</span>=&gt;[{<span class="pl-c1">:title</span>=&gt;<span class="pl-s"><span class="pl-pds">"</span>I am the God<span class="pl-pds">"</span></span>, <span class="pl-c1">:text</span>=&gt;<span class="pl-s"><span class="pl-pds">"</span>&lt;b&gt;yep&lt;/b&gt;<span class="pl-pds">"</span></span>}]}]}</pre></div>
+
+<h3>
+<a id="shortcuts" class="anchor" href="#shortcuts" aria-hidden="true"><span class="octicon octicon-link"></span></a>Shortcuts</h3>
+
+<p>Methods <code>iterate</code>, <code>scope</code>, <code>namespace</code> have one symbol shorcuts:</p>
+
+<div class="highlight highlight-ruby"><pre>hash <span class="pl-k">=</span> <span class="pl-c1">JT</span>.t(json) {
+  total
+
+  iterate(<span class="pl-c1">:users</span>, <span class="pl-c1">:results</span>) {
+    status
+
+    s(<span class="pl-c1">:personalInformation</span>) { age; city }
+    n(<span class="pl-c1">:account_info</span>) { money; account_name <span class="pl-s"><span class="pl-pds">'</span>accountName<span class="pl-pds">'</span></span> }
+    i(<span class="pl-c1">:docs</span>, <span class="pl-c1">:documents</span>) { title; text <span class="pl-s"><span class="pl-pds">'</span>htmlContent<span class="pl-pds">'</span></span> }
+  }
+}</pre></div>
+
+<h3>
+<a id="syntax-with--symbol" class="anchor" href="#syntax-with--symbol" aria-hidden="true"><span class="octicon octicon-link"></span></a>Syntax with '.' symbol</h3>
+
+<p>Scopes and namespaces support syntax with '.' symbol to avoid block nesting.
+For json:</p>
+
+<div class="highlight highlight-ruby"><pre>json <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">&lt;&lt;-json</span></span>
+<span class="pl-s">{</span>
+<span class="pl-s">   "user":{</span>
+<span class="pl-s">      "name":"Speransky Danil",</span>
+<span class="pl-s">      "age":23,</span>
+<span class="pl-s">      "city":"Novosibirsk",</span>
+<span class="pl-s">      "account":{</span>
+<span class="pl-s">         "money":500.0,</span>
+<span class="pl-s">         "cart":{</span>
+<span class="pl-s">            "total":2,</span>
+<span class="pl-s">            "items":[</span>
+<span class="pl-s">               {</span>
+<span class="pl-s">                  "productId":143,</span>
+<span class="pl-s">                  "count":1</span>
+<span class="pl-s">               },</span>
+<span class="pl-s">               {</span>
+<span class="pl-s">                  "productId":245,</span>
+<span class="pl-s">                  "count":2</span>
+<span class="pl-s">               }</span>
+<span class="pl-s">            ]</span>
+<span class="pl-s">         }</span>
+<span class="pl-s">      }</span>
+<span class="pl-s">   }</span>
+<span class="pl-s">}</span>
+<span class="pl-s"><span class="pl-pds">json</span></span></pre></div>
+
+<p>Instead of</p>
+
+<div class="highlight highlight-ruby"><pre>hash <span class="pl-k">=</span> <span class="pl-c1">JT</span>.t(json) {
+  s(<span class="pl-c1">:user</span>) {
+    name
+    s(<span class="pl-c1">:account</span>) {
+      s(<span class="pl-c1">:cart</span>) {
+        items_count <span class="pl-s"><span class="pl-pds">'</span>total<span class="pl-pds">'</span></span>
+      }
+    }
+  }
+}
+
+pp hash <span class="pl-c">#=&gt; {:name=&gt;"Speransky Danil", :items_count=&gt;2}</span></pre></div>
+
+<p>You write</p>
+
+<div class="highlight highlight-ruby"><pre>hash <span class="pl-k">=</span> <span class="pl-c1">JT</span>.t(json) {
+  s(<span class="pl-c1">:user</span>) {
+    name
+    s(<span class="pl-s"><span class="pl-pds">'</span>account.cart<span class="pl-pds">'</span></span>) { items_count <span class="pl-s"><span class="pl-pds">'</span>total<span class="pl-pds">'</span></span> }
+  }
+}
+
+pp hash <span class="pl-c">#=&gt; {:name=&gt;"Speransky Danil", :items_count=&gt;2}</span></pre></div>
+
+<h3>
+<a id="notices" class="anchor" href="#notices" aria-hidden="true"><span class="octicon octicon-link"></span></a>Notices</h3>
+
+<ul>
+<li>
+<code>JT.t</code> accepts json string or hash or array</li>
+<li>Itaratings, scopes and namespaces could be nested in any order and arbitrary number of times</li>
+</ul>
+
+<p><strong>Author (Speransky Danil):</strong>
+<a href="http://dsperansky.info">Personal Page</a> |
+<a href="http://ru.linkedin.com/in/speranskydanil/en">LinkedIn</a> |
+<a href="https://github.com/speranskydanil?tab=repositories">GitHub</a> |
+<a href="http://stackoverflow.com/users/1550807/speransky-danil">StackOverflow</a></p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/speranskydanil/json-translator">JSON Translator</a> is maintained by <a href="https://github.com/speranskydanil">speranskydanil</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
+
