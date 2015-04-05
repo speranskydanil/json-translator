@@ -1,4 +1,4 @@
-# Json Translator
+# JSON Translator
 
 A library to transform json from one scheme to another.
 
@@ -8,7 +8,7 @@ A library to transform json from one scheme to another.
 
     require 'json-translator'
 
-### Quick example
+## Quick example
 
 Suppose we use API which responses with next simple json:
 
@@ -118,7 +118,7 @@ The output will be:
     :docs=>[{:title=>"I am the God", :text=>"<b>yep</b>"}]}]}
 ```
 
-### Shortcuts
+## Shortcuts
 
 Methods `iterate`, `scope`, `namespace` have one symbol shorcuts:
 
@@ -136,7 +136,7 @@ hash = JT.t(json) {
 }
 ```
 
-### Syntax with '.' symbol
+## Syntax with '.' symbol
 
 Scopes and namespaces support syntax with '.' symbol to avoid block nesting.
 For json:
@@ -199,7 +199,7 @@ hash = JT.t(json) {
 pp hash #=> {:name=>"Speransky Danil", :items_count=>2}
 ```
 
-### Notices
+## Notices
 
 * `JT.t` accepts json string or hash or array
 * Itaratings, scopes and namespaces could be nested in any order and arbitrary number of times
