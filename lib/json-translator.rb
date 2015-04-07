@@ -19,12 +19,15 @@ class JT
     @result
   end
 
-  def method_missing(name, *args)
+  def method_missing(name, *args, &block)
     raise "JT##{name} expects 0 or 1 argument" if args.size > 1
     raise "JT##{name} can't get key from #{@data_pointer.inspect}" unless @data_pointer.is_a? Hash
     raise "JT##{name} can't set key to #{@result_pointer.inspect}" unless @result_pointer.is_a? Hash
 
-    @result_pointer[name] = @data_pointer[(args.first || name).to_s]
+    value = (args.first || name).to_s
+    value = block.call(value) if block_given?
+
+    @result_pointer[name] = @data_pointer[value]
   end
 
   def scope(name, &block)
