@@ -24,10 +24,10 @@ class JT
     raise "JT##{name} can't get key from #{@data_pointer.inspect}" unless @data_pointer.is_a? Hash
     raise "JT##{name} can't set key to #{@result_pointer.inspect}" unless @result_pointer.is_a? Hash
 
-    value = (args.first || name).to_s
+    value = @data_pointer[(args.first || name).to_s]
     value = block.call(value) if block_given?
 
-    @result_pointer[name] = @data_pointer[value]
+    @result_pointer[name] = value
   end
 
   def scope(name, &block)
