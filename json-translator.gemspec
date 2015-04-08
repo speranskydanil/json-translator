@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name         = 'json-translator'
-  s.version      = '1.0.1'
+  s.version      = '1.0.2'
   s.licenses     = ['MIT']
   s.authors      = ['Speransky Danil']
   s.summary      = 'A library to transform json from one scheme to another.'
