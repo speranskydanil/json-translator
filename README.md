@@ -89,7 +89,8 @@ hash = JT.t(json) do
     end
 
     iterate :docs, :documents do
-      title
+      # you could pass a block to transform value
+      title { |t| t.split.map(&:capitalize).join(' ') }
       # rename 'htmlContent' to :text
       text 'htmlContent'
     end
@@ -115,7 +116,16 @@ The output will be:
     :age=>24,
     :city=>"Berdsk",
     :account_info=>{:money=>63.24, :account_name=>"damaty"},
-    :docs=>[{:title=>"I am the God", :text=>"<b>yep</b>"}]}]}
+    :docs=>[{:title=>"I Am The God", :text=>"<b>yep</b>"}]}]}
+```
+
+## 't' method
+
+You could have conflicts when setting values with names as 'iterate', 'scope' or 'namespace',
+or if there are such variables in the method scope. Such keys could be set by 't' method.
+
+```ruby
+t :first_name, :firstName
 ```
 
 ## Shortcuts
